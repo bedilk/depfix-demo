@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
 
 dotenv.config();
 
@@ -12,23 +12,16 @@ if (!apiKey) {
   );
 }
 
-const configuration = new Configuration({
+export const openai = new OpenAI({
   apiKey,
   organization: process.env.OPENAI_ORG_ID,
 });
-
-/**
- * Shared OpenAI v3 client used by every module in the support bot.
- * All API calls go through this single instance so we can swap
- * keys or orgs in one place.
- */
-export const openai = new OpenAIApi(configuration);
 
 /** Default model for chat-based interactions. */
 export const CHAT_MODEL = "gpt-3.5-turbo";
 
 /** Default model for legacy completions (summarization, etc.). */
-export const COMPLETION_MODEL = "text-davinci-003";
+export const COMPLETION_MODEL = "gpt-3.5-turbo";
 
 /** Default embedding model for knowledge-base search. */
 export const EMBEDDING_MODEL = "text-embedding-ada-002";

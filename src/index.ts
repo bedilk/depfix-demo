@@ -1,4 +1,4 @@
-import { ChatCompletionRequestMessage } from "openai";
+import { ChatCompletionMessageParam } from "openai/resources";
 import { getCustomerSupportReply, quickAnswer } from "./chat";
 import { generateEmbedding, searchKnowledgeBase } from "./embeddings";
 import { moderateInput } from "./moderation";
@@ -15,7 +15,7 @@ import { generateSupportDiagram } from "./images";
  */
 async function handleSupportMessage(
   userMessage: string,
-  conversationHistory: ChatCompletionRequestMessage[]
+  conversationHistory: ChatCompletionMessageParam[]
 ) {
   console.log(`\n--- Processing: "${userMessage.slice(0, 60)}..." ---`);
 
@@ -45,10 +45,10 @@ async function handleSupportMessage(
  * features working end-to-end.
  */
 async function main() {
-  console.log("=== Acme Corp Customer Support Bot (OpenAI v3) ===\n");
+  console.log("=== Acme Corp Customer Support Bot (OpenAI v4+) ===\n");
 
   // --- Chat demo ---
-  const history: ChatCompletionRequestMessage[] = [];
+  const history: ChatCompletionMessageParam[] = [];
   const questions = [
     "Hi, I can't log into my account. It says my password is wrong.",
     "I already tried resetting it. The reset email never arrives.",

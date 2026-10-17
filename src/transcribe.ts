@@ -42,21 +42,21 @@ export async function transcribeVoiceMessage(
   }
 
   try {
-    const fileStream = fs.createReadStream(absolutePath) as any;
+    const file = fs.createReadStream(absolutePath);
 
-    const response = await openai.createTranscription(
-      fileStream,
-      "whisper-1",
-      "Transcribe this customer support voice message accurately.",
-      "json",
-      0.2,
-      "en"
-    );
+    const response = await openai.audio.transcriptions.create({
+      file,
+      model: "whisper-1",
+      prompt: "Transcribe this customer support voice message accurately.",
+      response_format: "json",
+      temperature: 0.2,
+      language: "en",
+    });
 
     return {
-      text: response.data.text,
-      language: (response.data as any).language,
-      duration: (response.data as any).duration,
+      text: response.text,
+      language: (response as any).language,
+      duration: (response as any).duration,
     };
   } catch (error: any) {
     throw new Error(`Voice transcription failed: ${error.message}`);

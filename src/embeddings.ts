@@ -20,12 +20,12 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   }
 
   try {
-    const response = await openai.createEmbedding({
+    const response = await openai.embeddings.create({
       model: EMBEDDING_MODEL,
       input: sanitized,
     });
 
-    const vector = response.data.data[0]?.embedding;
+    const vector = response.data[0]?.embedding;
 
     if (!vector || vector.length === 0) {
       throw new Error("API returned an empty embedding vector.");
