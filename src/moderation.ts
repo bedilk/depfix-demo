@@ -17,11 +17,11 @@ export async function moderateInput(text: string): Promise<ModerationResult> {
   }
 
   try {
-    const response = await openai.createModeration({
+    const response = await openai.moderations.create({
       input: text,
     });
 
-    const result = response.data.results[0];
+    const result = response.results[0];
 
     if (!result) {
       throw new Error("Moderation API returned no results.");
@@ -36,7 +36,6 @@ export async function moderateInput(text: string): Promise<ModerationResult> {
       }
     }
 
-    // Determine severity from the category scores
     const scores = result.category_scores as Record<string, number>;
     const maxScore = Math.max(...Object.values(scores));
 
@@ -55,9 +54,6 @@ export async function moderateInput(text: string): Promise<ModerationResult> {
       severity,
     };
   } catch (error: any) {
-    // Fail open: if moderation is down, log the error but let the
-    // message through. Better to serve customers than block on a
-    // moderation outage.
     console.error(`Moderation check failed: ${error.message}`);
     return { flagged: false, categories: [], severity: "none" };
   }

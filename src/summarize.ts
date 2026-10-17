@@ -1,4 +1,4 @@
-import { openai, COMPLETION_MODEL } from "./config";
+import { openai, CHAT_MODEL } from "./config";
 
 interface TicketSummary {
   summary: string;
@@ -8,8 +8,8 @@ interface TicketSummary {
 
 /**
  * Summarize a customer support ticket conversation using the
- * legacy completions endpoint (text-davinci-003). Produces a
- * short summary and a sentiment reading for the ticket dashboard.
+ * chat completions API. Produces a short summary and a sentiment
+ * reading for the ticket dashboard.
  */
 export async function summarizeTicket(
   ticketMessages: string[]
@@ -24,15 +24,14 @@ export async function summarizeTicket(
     `--- Conversation ---\n${transcript}\n\n--- Summary ---\n`;
 
   try {
-    const response = await openai.createCompletion({
-      model: COMPLETION_MODEL,
-      prompt,
+    const response = await openai.chat.completions.create({
+      model: CHAT_MODEL,
+      messages: [{ role: "user", content: prompt }],
       max_tokens: 256,
       temperature: 0.3,
-      stop: ["\n\n"],
     });
 
-    const rawText = response.data.choices[0]?.text?.trim() ?? "";
+    const rawText = response.choices[0]?.message?.content?.trim() ?? "";
     const lines = rawText.split("\n").filter((l) => l.trim());
 
     const summaryLines = lines.slice(0, -1);
@@ -48,7 +47,7 @@ export async function summarizeTicket(
     return {
       summary: summaryLines.join(" ") || rawText,
       sentiment,
-      tokensUsed: response.data.usage?.total_tokens ?? 0,
+      tokensUsed: response.usage?.total_tokens ?? 0,
     };
   } catch (error: any) {
     throw new Error(`Ticket summarization failed: ${error.message}`);
@@ -62,16 +61,19 @@ export async function summarizeTicket(
 export async function generateTicketTitle(
   firstMessage: string
 ): Promise<string> {
-  const prompt =
-    `Generate a short, descriptive title (max 10 words) for a ` +
-    `support ticket that starts with:\n"${firstMessage}"\n\nTitle:`;
-
-  const response = await openai.createCompletion({
-    model: COMPLETION_MODEL,
-    prompt,
+  const response = await openai.chat.completions.create({
+    model: CHAT_MODEL,
+    messages: [
+      {
+        role: "user",
+        content:
+          `Generate a short, descriptive title (max 10 words) for a ` +
+          `support ticket that starts with:\n"${firstMessage}"\n\nTitle:`,
+      },
+    ],
     max_tokens: 32,
     temperature: 0.5,
   });
 
-  return response.data.choices[0]?.text?.trim() ?? "Untitled Ticket";
+  return response.choices[0]?.message?.content?.trim() ?? "Untitled Ticket";
 }

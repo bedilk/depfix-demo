@@ -1,7 +1,7 @@
 {
   "name": "depfix-demo",
   "version": "1.0.0",
-  "description": "AI customer support bot using OpenAI v3 — demo repo for depfix migration tool",
+  "description": "AI customer support bot using OpenAI v4 — migrated from v3 by depfix",
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
@@ -9,7 +9,7 @@
     "dev": "ts-node-dev --respawn src/index.ts"
   },
   "dependencies": {
-    "openai": "3.3.0",
+    "openai": "^4.68.4",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {

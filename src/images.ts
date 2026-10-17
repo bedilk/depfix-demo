@@ -22,14 +22,14 @@ export async function generateSupportDiagram(
     `Suitable for embedding in a support email.`;
 
   try {
-    const response = await openai.createImage({
+    const response = await openai.images.generate({
       prompt,
       n: 1,
       size,
       response_format: "url",
     });
 
-    const imageData = response.data.data[0];
+    const imageData = response.data[0];
 
     if (!imageData?.url) {
       throw new Error("Image generation returned no URL.");
@@ -37,10 +37,10 @@ export async function generateSupportDiagram(
 
     return {
       url: imageData.url,
-      revisedPrompt: undefined, // v3 doesn't return revised prompts
+      revisedPrompt: imageData.revised_prompt,
     };
   } catch (error: any) {
-    if (error.response?.status === 400) {
+    if (error.status === 400) {
       throw new Error(
         "Image generation was rejected. The description may contain " +
           "content that violates the usage policy."
@@ -65,14 +65,14 @@ export async function generateDiagramVariations(
     `Clean, professional technical diagram: ${description}. ` +
     `Simple shapes, clear labels, white background.`;
 
-  const response = await openai.createImage({
+  const response = await openai.images.generate({
     prompt,
     n: safeCount,
     size,
     response_format: "url",
   });
 
-  return response.data.data
+  return response.data
     .filter((d) => d.url)
-    .map((d) => ({ url: d.url!, revisedPrompt: undefined }));
+    .map((d) => ({ url: d.url!, revisedPrompt: d.revised_prompt }));
 }
